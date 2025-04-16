@@ -1,0 +1,430 @@
+// Script File Name : BIOSSettings.txt
+// Created on 04/14/25 at 04:43:27    
+// Copyright (c)2018 American Megatrends, Inc.
+// AMISCE Utility. Ver 5.03.1115
+
+HIICrc32= 59B5A216
+
+Setup Question	= Spread Spectrum
+Token	=102	// Do NOT change this line
+Offset	=149
+Width	=01
+BIOS Default	=[02]Auto 
+Options	=[02]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= SMT Control
+Token	=2ADA	// Do NOT change this line
+Offset	=5EE
+Width	=01
+BIOS Default	=[01]Auto 
+Options	=[01]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+
+Setup Question	= SMT Control
+Token	=1C	// Do NOT change this line
+Offset	=30
+Width	=01
+Options	=*[00]Disable	// Move "*" to the desired Option
+         [01]Auto
+
+Setup Question	= SMT Control
+Token	=2D	// Do NOT change this line
+Offset	=28B
+Width	=01
+Options	=*[00]Disable	// Move "*" to the desired Option
+         [01]Auto
+
+Setup Question	= SMT Control
+Token	=2A20	// Do NOT change this line
+Offset	=525
+Width	=01
+BIOS Default	=[01]Auto 
+Options	=[01]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+
+Setup Question	= SMT Control
+Token	=2ADA	// Do NOT change this line
+Offset	=5EE
+Width	=01
+BIOS Default	=[01]Auto 
+Options	=[01]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+
+Setup Question	= SMT Control
+Token	=2B5D	// Do NOT change this line
+Offset	=6CE
+Width	=01
+BIOS Default	=[01]Auto 
+Options	=[01]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+
+Setup Question	= IOMMU
+Token	=2A66	// Do NOT change this line
+Offset	=4F6
+Width	=01
+BIOS Default	=[0F]Auto 
+Options	=[0F]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= IOMMU
+Token	=DF	// Do NOT change this line
+Offset	=149
+Width	=01
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         [0F]Auto
+
+Setup Question	= IOMMU
+Token	=2B13	// Do NOT change this line
+Offset	=62C
+Width	=01
+BIOS Default	=[0F]Auto 
+Options	=[0F]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= IOMMU
+Token	=2B96	// Do NOT change this line
+Offset	=70C
+Width	=01
+BIOS Default	=[0F]Auto 
+Options	=[0F]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= IOMMU
+Token	=2FF	// Do NOT change this line
+Offset	=180
+Width	=01
+BIOS Default	=[FF]Auto 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         [FF]Auto
+
+Setup Question	= Global C-state Control
+Token	=12	// Do NOT change this line
+Offset	=24
+Width	=01
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         [03]Auto
+
+Setup Question	= Global C-state Control
+Token	=2A19	// Do NOT change this line
+Offset	=4A9
+Width	=01
+BIOS Default	=[00]Disabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         [03]Auto
+
+Setup Question	= Global C-state Control
+Token	=2AD6	// Do NOT change this line
+Offset	=5EF
+Width	=01
+BIOS Default	=[03]Auto 
+Options	=[03]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= Global C-state Control
+Token	=2B59	// Do NOT change this line
+Offset	=6CF
+Width	=01
+BIOS Default	=[03]Auto 
+Options	=[03]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= Chipset Power Saving Features
+Token	=2F0	// Do NOT change this line
+Offset	=A6
+Width	=01
+BIOS Default	=[01]Enabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+Setup Question	= Remote Display Feature
+Token	=300	// Do NOT change this line
+Offset	=181
+Width	=01
+BIOS Default	=[FF]Auto 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         [FF]Auto
+
+Setup Question	=  PS2 Devices Support
+Token	=313	// Do NOT change this line
+Offset	=05
+Width	=01
+BIOS Default	=[01]Enabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+Setup Question	= Ipv6 PXE Support
+Token	=BB	// Do NOT change this line
+Offset	=02
+Width	=01
+BIOS Default	=[01]Enabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+// Setup Question	= Ipv6 PXE Support
+// Token	=24A	// Do NOT change this line
+// Offset	=02
+// Width	=01
+// BIOS Default	=[01]Enabled 
+// Options	=*[00]Disabled	// Move "*" to the desired Option
+//         [01]Enabled
+
+Setup Question	= IPv6 HTTP Support
+Token	=24B	// Do NOT change this line
+Offset	=07
+Width	=01
+BIOS Default	=[00]Disabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+Setup Question	= PSS Support
+Token	=2A18	// Do NOT change this line
+Offset	=4A5
+Width	=01
+BIOS Default	=[02]Auto 
+Options	=[02]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= PSS Support
+Token	=2AD5	// Do NOT change this line
+Offset	=5EC
+Width	=01
+BIOS Default	=[02]Auto 
+Options	=[02]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= PSS Support
+Token	=2B58	// Do NOT change this line
+Offset	=6CC
+Width	=01
+BIOS Default	=[02]Auto 
+Options	=[02]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= PSS Support
+Token	=1F9	// Do NOT change this line
+Offset	=157
+Width	=01
+BIOS Default	=[02]Auto 
+Options	=[02]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= AB Clock Gating
+Token	=2A2	// Do NOT change this line
+Offset	=5E
+Width	=01
+BIOS Default	=[FF]Auto 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         [FF]Auto
+
+Setup Question	= PCIB Clock Run
+Token	=2A3	// Do NOT change this line
+Offset	=5F
+Width	=01
+BIOS Default	=[FF]Auto 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         [FF]Auto
+
+Setup Question	= Enable Hibernation
+Token	=1A5	// Do NOT change this line
+Offset	=34
+Width	=01
+BIOS Default	=1 
+Value	=1	// Enabled = 0, Disabled = 1
+
+Setup Question	= SR-IOV Support
+Token	=B2	// Do NOT change this line
+Offset	=189
+Width	=01
+BIOS Default	=[00]Disabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+// Setup Question	= SR-IOV Support
+// Token	=20E	// Do NOT change this line
+// Offset	=189
+// Width	=01
+// BIOS Default	=[00]Disabled 
+// Options	=*[00]Disabled	// Move "*" to the desired Option
+//         [01]Enabled
+
+Setup Question	= BME DMA Mitigation
+Token	=20F	// Do NOT change this line
+Offset	=18A
+Width	=01
+BIOS Default	=[00]Disabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+Setup Question	= Opcache Control
+Token	=2AD8	// Do NOT change this line
+Offset	=5F0
+Width	=01
+BIOS Default	=[FF]Auto 
+Options	=[FF]Auto	// Move "*" to the desired Option
+         *[01]Disabled
+         [00]Enabled
+
+Setup Question	= PCI-X Latency Timer
+Token	=209	// Do NOT change this line
+Offset	=18F
+Width	=01
+BIOS Default	=[40]64 PCI Bus Clocks 
+Options	=*[20]32 PCI Bus Clocks	// Move "*" to the desired Option
+         [40]64 PCI Bus Clocks
+         [60]96 PCI Bus Clocks
+         [80]128 PCI Bus Clocks
+         [A0]160 PCI Bus Clocks
+         [C0]192 PCI Bus Clocks
+         [E0]224 PCI Bus Clocks
+         [F8]248 PCI Bus Clocks
+
+Setup Question	= Re-Size BAR Support
+Token	=2BE7	// Do NOT change this line
+Offset	=188
+Width	=01
+BIOS Default	=[00]Disabled 
+Options	=[00]Disabled	// Move "*" to the desired Option
+         *[01]Enabled
+
+Setup Question	= Above 4G memory/Crypto Currency mining
+Token	=A9	// Do NOT change this line
+Offset	=187
+Width	=01
+BIOS Default	=[00]Disabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+Setup Question	= PM L1 SS
+Token	=0E	// Do NOT change this line
+Offset	=70
+Width	=01
+Options	=[FF]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]L1.1
+         [02]L1.2
+         [03]L1.1_L1.2
+
+Setup Question	= Special Display Features
+Token	=7D1	// Do NOT change this line
+Offset	=02
+Width	=01
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [03]PowerXpress
+         [04]HybridGraphics
+
+Setup Question	= Clock Power Management(CLKREQ#)
+Token	=10	// Do NOT change this line
+Offset	=06
+Width	=01
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled 
+
+Setup Question	= Aggressive Link PM Capability
+Token	=2C8	// Do NOT change this line
+Offset	=7D
+Width	=01
+BIOS Default	=[00]Disabled 
+Options	=*[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+
+Setup Question	= PPC Adjustment
+Token	=1FA	// Do NOT change this line
+Offset	=159
+Width	=01
+BIOS Default	=[00]PState 0 
+Options	=*[00]PState 0	// Move "*" to the desired Option
+
+// Setup Question	= PPC Adjustment
+// Token	=1FB	// Do NOT change this line
+// Offset	=159
+// Width	=01
+// BIOS Default	=[00]PState 0 
+// Options	=*[00]PState 0	// Move "*" to the desired Option
+//         [01]PState 1
+
+// Setup Question	= PPC Adjustment
+// Token	=1FC	// Do NOT change this line
+// Offset	=159
+// Width	=01
+// BIOS Default	=[00]PState 0 
+// Options	=*[00]PState 0	// Move "*" to the desired Option
+//         [01]PState 1
+//         [02]PState 2
+
+// Setup Question	= PPC Adjustment
+// Token	=1FD	// Do NOT change this line
+// Offset	=159
+// Width	=01
+// BIOS Default	=[00]PState 0 
+// Options	=*[00]PState 0	// Move "*" to the desired Option
+//         [01]PState 1
+//         [02]PState 2
+//         [03]PState 3
+
+// Setup Question	= PPC Adjustment
+// Token	=1FE	// Do NOT change this line
+// Offset	=159
+// Width	=01
+// BIOS Default	=[00]PState 0 
+// Options	=*[00]PState 0	// Move "*" to the desired Option
+//         [01]PState 1
+//         [02]PState 2
+//         [03]PState 3
+//         [04]PState 4
+
+// Setup Question	= PPC Adjustment
+// Token	=1FF	// Do NOT change this line
+// Offset	=159
+// Width	=01
+// BIOS Default	=[00]PState 0 
+// Options	=*[00]PState 0	// Move "*" to the desired Option
+//         [01]PState 1
+//         [02]PState 2
+//         [03]PState 3
+//         [04]PState 4
+//         [05]PState 5
+
+// Setup Question	= PPC Adjustment
+// Token	=200	// Do NOT change this line
+// Offset	=159
+// Width	=01
+// BIOS Default	=[00]PState 0 
+// Options	=*[00]PState 0	// Move "*" to the desired Option
+//         [01]PState 1
+//         [02]PState 2
+//         [03]PState 3
+//         [04]PState 4
+//         [05]PState 5
+//         [06]PState 6
+
+// Setup Question	= PPC Adjustment
+// Token	=201	// Do NOT change this line
+// Offset	=159
+// Width	=01
+// BIOS Default	=[00]PState 0 
+// Options	=*[00]PState 0	// Move "*" to the desired Option
+//         [01]PState 1
+//         [02]PState 2
+//         [03]PState 3
+//         [04]PState 4
+//         [05]PState 5
+//         [06]PState 6
+//         [07]PState 7
