@@ -14,6 +14,32 @@ Options	=[02]Auto	// Move "*" to the desired Option
          *[00]Disabled
          [01]Enabled
 
+Setup Question	= Spread Spectrum
+Token	=F6	// Do NOT change this line
+Offset	=145
+Width	=01
+BIOS Default	=[02]Auto 
+Options	=[02]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
+Setup Question	= SB Clock Spread Spectrum
+Token	=2DA	// Do NOT change this line
+Offset	=A3
+Width	=01
+BIOS Default	=[FF]Auto 
+Options	=[00]Disabled	// Move "*" to the desired Option
+         [01]Enabled
+         *[FF]Auto
+
+Setup Question	= SMT Control
+Token	=2A0C	// Do NOT change this line
+Offset	=4F8
+Width	=01
+BIOS Default	=[01]Auto 
+Options	=[01]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+
 Setup Question	= SMT Control
 Token	=2ADA	// Do NOT change this line
 Offset	=5EE
