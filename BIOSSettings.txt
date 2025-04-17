@@ -139,6 +139,15 @@ Options	=[03]Auto	// Move "*" to the desired Option
          *[00]Disabled
          [01]Enabled
 
+Setup Question	= Global C-state Control
+Token	=2A05	// Do NOT change this line
+Offset	=47C
+Width	=01
+BIOS Default	=[03]Auto 
+Options	=[03]Auto	// Move "*" to the desired Option
+         *[00]Disabled
+         [01]Enabled
+
 Setup Question	= Chipset Power Saving Features
 Token	=2F0	// Do NOT change this line
 Offset	=A6
