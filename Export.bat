@@ -1,2 +1,4 @@
 @echo off
-SCEWIN_64.exe /o /s Results.txt
+echo Exporting BIOS settings...
+SCEWIN_64.exe /O /E "%ProgramData%\warris\Results.txt"
+echo BIOS settings exported successfully.
