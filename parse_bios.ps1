@@ -3,7 +3,7 @@ param(
     [string]$OutputPath
 )
 
-# Liste des paramètres à forcer sur ENABLE ou spécifiques
+# Liste des paramètres à forcer sur ENABLE ou avec une option spécifique
 $enabledParams = @{
     "Channel Interleaving" = "Enabled"
     "Bank Interleaving" = "Enabled"
@@ -11,7 +11,7 @@ $enabledParams = @{
     "PCI-X Latency Timer" = "32 PCI Bus Clocks"
 }
 
-# Liste complète des paramètres à modifier
+# Liste des paramètres ciblés
 $targetParams = @(
     "IOMMU", "Spread Spectrum", "SB Clock Spread Spectrum", "SMT Control",
     "AMD Cool'N'Quiet", "Fast Boot", "Global C-state Control", "Chipset Power Saving Features",
@@ -22,51 +22,68 @@ $targetParams = @(
     "Bank Interleaving", "SATA GPIO", "Aggressive Link PM Capability", "Core C6 State", "PPC Adjustment"
 )
 
-# Read export file and prepare output
-$output = @()
+# Header obligatoire
+$header = @()
+// Date du jour
+$now = Get-Date -Format "MM/dd/yy 'at' HH:mm:ss"
+$header += "// Script File Name : BIOSSettings.txt"
+$header += "// Created on $now"
+$header += "// Copyright (c)2018 American Megatrends, Inc."
+$header += "// AMISCE Utility. Ver 5.03.1115"
+$header += ""
+$header += "HIICrc32= 16BBDC39"
+$header += ""
+
+# Lecture du fichier exporté
 $lines = Get-Content $ExportPath
-$inBlock = $false
+$output = @()
 $currentBlock = @()
 $foundName = ""
+$inBlock = $false
 
 foreach ($line in $lines) {
     if ($line -match "^Setup Question\s*=\s*(.+)$") {
         if ($inBlock -and $targetParams -contains $foundName) {
-            $output += $currentBlock
-            $output += "" # ligne vide
+            $output += $currentBlock + ""
         }
         $foundName = $matches[1].Trim()
         $currentBlock = @($line)
         $inBlock = $true
-    } elseif ($inBlock -and $line -match "^Setup Question") {
-        $inBlock = $false
-        if ($targetParams -contains $foundName) {
-            $output += $currentBlock
-            $output += "" # ligne vide
-        }
-        $currentBlock = @($line)
-        $foundName = $line
-        $inBlock = $true
-    } elseif ($inBlock) {
-        if ($line -match "^\s*\*?\[\w+\](.+?)$") {
-            $option = $matches[1].Trim()
-            $desired = $enabledParams[$foundName]
-            if ($desired -and $option -like "*$desired*") {
-                $line = $line -replace "^\s*\*?", "         *"
-            } elseif (-not $desired -and $option -like "*Disabled*") {
-                $line = $line -replace "^\s*\*?", "         *"
+    } elseif ($inBlock -and $line -match "^\s*Options\s*=") {
+        $processedOptions = @()
+        $desired = $enabledParams[$foundName]
+
+        for ($i = 0; $i -lt 10; $i++) {
+            if ($lines[$lines.IndexOf($line) + $i] -match "^\s*(\*?)\[(\w+)\](.+)$") {
+                $isSelected = $matches[1]
+                $hex = $matches[2]
+                $option = $matches[3].Trim()
+
+                if ($desired -and $option -like "*$desired*") {
+                    $processedOptions += "         *[$hex]$option"
+                } elseif (-not $desired -and $option -like "*Disabled*") {
+                    $processedOptions += "         *[$hex]$option"
+                } else {
+                    $processedOptions += "         [$hex]$option"
+                }
             } else {
-                $line = $line -replace "^\s*\*", "         "
+                break
             }
         }
+
+        $currentBlock += $line
+        $currentBlock += $processedOptions
+        $inBlock = $false
+
+    } elseif ($inBlock -and $line -match "^(Token|Offset|Width)\s*=") {
         $currentBlock += $line
     }
 }
 
-# Dernier bloc
 if ($inBlock -and $targetParams -contains $foundName) {
-    $output += $currentBlock
+    $output += $currentBlock + ""
 }
 
-# Écriture
-$output | Set-Content $OutputPath -Encoding ascii
+# Sauvegarde du fichier proprement
+$final = $header + $output
+$final | Set-Content -Encoding ascii -Path $OutputPath
