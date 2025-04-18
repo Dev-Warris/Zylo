@@ -13,18 +13,25 @@ $disableParams = @(
 )
 
 $content = Get-Content $InputFile -Raw
+$newContent = [System.Text.StringBuilder]::new()
 
-$pattern = '(?sm)(Setup Question\s*=\s*(?<name>.*?)\r?\n.*?Options\s*=\s*)(?<options>.*?)(\r?\n\s*\*?\[00\]Disabled)?'
+$pattern = '(?sm)(Setup Question\s*=\s*(?<name>.*?)\r?\n.*?Options\s*=\s*(?<options>.*?)(\r?\n\s*\*?\[[0-9]+\].*?)*)'
 
 $content = [regex]::Replace($content, $pattern, {
     param($match)
     $paramName = $match.Groups['name'].Value.Trim()
+    $optionsBlock = $match.Groups[0].Value
     
     if ($disableParams -contains $paramName) {
-        $cleanOptions = $match.Groups['options'].Value -replace '\*\[[0-9]+\]', ''
-        return $match.Groups[1].Value + $cleanOptions + "`r`n         *[00]Disabled"
+        # Supprimer toutes les sélections existantes
+        $optionsBlock = $optionsBlock -replace '\*\[[0-9]+\]', ''
+        # Ajouter *[00]Disabled en dernière position
+        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)(\[[0-9]+\])', "`$1*`$2"
+        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)\*\[00\]', "`$1*[00]"
     }
-    return $match.Value
+    
+    return $optionsBlock
 })
 
-$content | Out-File $InputFile -Encoding ASCII
+# Écrire le résultat dans le même fichier
+[System.IO.File]::WriteAllText($InputFile, $content, [System.Text.Encoding]::ASCII)
