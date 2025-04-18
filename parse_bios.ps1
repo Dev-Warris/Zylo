@@ -1,9 +1,6 @@
-param(
-    [string]$FichierBIOS = "BIOSSettings.txt"
-)
+param([string]$FichierBIOS)
 
-# Liste complète des paramètres à désactiver
-$paramsDesactiver = @(
+$paramsADesactiver = @(
     "IOMMU", "Spread Spectrum", "SB Clock Spread Spectrum",
     "SMT Control", "AMD Cool'N'Quiet", "Fast Boot",
     "Global C-state Control", "Chipset Power Saving Features",
@@ -15,24 +12,19 @@ $paramsDesactiver = @(
 
 $contenu = Get-Content $FichierBIOS -Raw
 
-# Pattern amélioré pour la compatibilité AMI
-$pattern = '(?sm)(Setup Question\s*=\s*(?<nom>.*?)\r?\n.*?Options\s*=\s*)(?<options>.*?)(\r?\n\s*)(\*?\[[0-9]+\].*?)*'
+$pattern = '(?sm)(Setup Question\s*=\s*(?<nom>.*?)\r?\n(?!.*Token.*Offset.*Width)(Options\s*=\s*.*?\r?\n\s*)(\*?\[[0-9]+\][^\r\n]*)'
 
 $contenu = [regex]::Replace($contenu, $pattern, {
     param($match)
-    $nomParam = $match.Groups['nom'].Value.Trim()
-    
-    if ($paramsDesactiver -contains $nomParam) {
-        $nouvellesOptions = $match.Groups['options'].Value -replace '\*\[[0-9]+\]', ''
-        return $match.Groups[1].Value + $nouvellesOptions + $match.Groups[3].Value + "*[00]Disabled"
+    if ($paramsADesactiver -contains $match.Groups['nom'].Value.Trim()) {
+        $lignesOptions = $match.Groups[2].Value + $match.Groups[3].Value
+        $lignesOptions = $lignesOptions -replace '\*\[[0-9]+\]', ''
+        return $match.Groups[1].Value + $lignesOptions.Trim() + "`r`n         *[00]Disabled"
     }
-    
     return $match.Value
 })
 
-# Réécriture du fichier avec formatage correct
-[System.IO.File]::WriteAllText($FichierBIOS, $contenu, [System.Text.Encoding]::ASCII)
+[IO.File]::WriteAllText($FichierBIOS, $contenu, [Text.Encoding]::ASCII)
 
-# Comptage des modifications
 $nbModifs = ($contenu | Select-String "\*\[00\]Disabled" -AllMatches).Matches.Count
-Write-Output "$nbModifs parametres desactives avec succes"
+Write-Output "$nbModifs paramètres ont été désactivés"
