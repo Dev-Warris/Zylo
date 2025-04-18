@@ -2,7 +2,8 @@ param(
     [string]$InputFile = "BIOSSettings.txt"
 )
 
-$disableParams = @(
+# Complete list of parameters to disable
+$paramsToDisable = @(
     "IOMMU", "Spread Spectrum", "SB Clock Spread Spectrum",
     "SMT Control", "AMD Cool'N'Quiet", "Fast Boot",
     "Global C-state Control", "Chipset Power Saving Features",
@@ -13,25 +14,30 @@ $disableParams = @(
 )
 
 $content = Get-Content $InputFile -Raw
-$newContent = [System.Text.StringBuilder]::new()
 
-$pattern = '(?sm)(Setup Question\s*=\s*(?<name>.*?)\r?\n.*?Options\s*=\s*(?<options>.*?)(\r?\n\s*\*?\[[0-9]+\].*?)*)'
+# Enhanced regex pattern for complete parameter blocks
+$pattern = '(?s)(Setup Question\s*=\s*(?<name>.*?)\r?\n.*?Token\s*=\s*.*?\r?\n.*?Offset\s*=\s*.*?\r?\n.*?Width\s*=\s*.*?\r?\n.*?BIOS Default\s*=\s*.*?\r?\n.*?Options\s*=\s*(?<options>.*?)(\r?\n\s*\*?\[[0-9]+\].*?)*)'
 
 $content = [regex]::Replace($content, $pattern, {
     param($match)
     $paramName = $match.Groups['name'].Value.Trim()
     $optionsBlock = $match.Groups[0].Value
     
-    if ($disableParams -contains $paramName) {
-        # Supprimer toutes les sélections existantes
+    if ($paramsToDisable -contains $paramName) {
+        # Remove all existing selections
         $optionsBlock = $optionsBlock -replace '\*\[[0-9]+\]', ''
-        # Ajouter *[00]Disabled en dernière position
-        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)(\[[0-9]+\])', "`$1*`$2"
-        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)\*\[00\]', "`$1*[00]"
+        # Force selection to [00]Disabled
+        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)(\[00\])', "`$1*`$2"
+        # Remove other selections
+        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)\*\[', "`$1 ["
     }
     
     return $optionsBlock
 })
 
-# Écrire le résultat dans le même fichier
+# Rewrite file with proper AMI formatting
 [System.IO.File]::WriteAllText($InputFile, $content, [System.Text.Encoding]::ASCII)
+
+# Final verification
+$disabledCount = (Select-String -Path $InputFile -Pattern "\*\[00\]" -AllMatches).Matches.Count
+Write-Output "$disabledCount parameters have been disabled"
