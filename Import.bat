@@ -1,2 +1,2 @@
 @echo off
-SCEWIN_64.exe /I /S "C:\ProgramData\warris\BIOSSettings.txt"
+SCEWIN_64.exe /i /s BIOSSettings.txt
