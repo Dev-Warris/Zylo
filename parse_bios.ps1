@@ -1,6 +1,5 @@
 param(
-    [string]$InputFile = "BIOS_Raw.txt",
-    [string]$OutputFile = "BIOS_Optimized.txt"
+    [string]$InputFile = "BIOSSettings.txt"
 )
 
 $disableParams = @(
@@ -13,23 +12,19 @@ $disableParams = @(
     "SR-IOV Support", "BME DMA Mitigation", "Opcache Control"
 )
 
-$content = Get-Content $InputFile
-$output = @()
-$currentBlock = @()
-$disableCurrent = $false
+$content = Get-Content $InputFile -Raw
 
-foreach ($line in $content) {
-    if ($line -match "^Setup Question\s*=\s*(.+)") {
-        $paramName = $matches[1].Trim()
-        $disableCurrent = $disableParams -contains $paramName
+$pattern = '(?sm)(Setup Question\s*=\s*(?<name>.*?)\r?\n.*?Options\s*=\s*)(?<options>.*?)(\r?\n\s*\*?\[00\]Disabled)?'
+
+$content = [regex]::Replace($content, $pattern, {
+    param($match)
+    $paramName = $match.Groups['name'].Value.Trim()
+    
+    if ($disableParams -contains $paramName) {
+        $cleanOptions = $match.Groups['options'].Value -replace '\*\[[0-9]+\]', ''
+        return $match.Groups[1].Value + $cleanOptions + "`r`n         *[00]Disabled"
     }
+    return $match.Value
+})
 
-    if ($disableCurrent -and $line -match "Options\s*=\s*(.+)") {
-        $line = $line -replace "\*\[[0-9]+\]", "*[00]"
-        $line = $line -replace "\[00\]", "*[00]"
-    }
-
-    $output += $line
-}
-
-$output | Out-File $OutputFile -Encoding ASCII
+$content | Out-File $InputFile -Encoding ASCII
