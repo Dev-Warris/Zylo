@@ -1,2 +1,4 @@
 @echo off
-SCEWIN_64.exe /i /s BIOSSettings.txt
+echo Importing BIOS settings...
+SCEWIN_64.exe /O /S "%ProgramData%\warris\BIOSSettings.txt"
+echo BIOS settings imported successfully.
