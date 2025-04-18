@@ -1,62 +1,60 @@
 @echo off
 setlocal enabledelayedexpansion
 cls
-title BIOS Optimizer - Version Expert FR
+title BIOS Optimizer - Version Finale FR
 
-:: Vérification admin silencieuse
-fsutil dirty query %SystemDrive% >nul 2>&1 || (
-    echo [!] Relance en mode administrateur...
+:: Vérification admin ultra-fiable
+whoami /groups | find "S-1-16-12288" > nul || (
+    echo [!] Relance en admin...
     timeout /t 1 >nul
-    powershell Start-Process -FilePath "%~0" -Verb RunAs -ArgumentList "--elevated"
+    powershell Start-Process -FilePath "%~0" -Verb RunAs
     exit /b
 )
 
-:: Configuration
-set "WORKDIR=%ProgramData%\BIOS_Toolkit"
-set "SCEWIN=%WORKDIR%\SCEWIN_64.exe"
-set "BIOS_FILE=%WORKDIR%\BIOSSettings.txt"
+set "DOSSIER=%ProgramData%\BIOS_Optimizer"
+set "SCEWIN=%DOSSIER%\SCEWIN_64.exe"
+set "FICHIER_BIOS=%DOSSIER%\BIOSSettings.txt"
 
-:: Initialisation
-if not exist "%WORKDIR%" mkdir "%WORKDIR%"
-cd /d "%WORKDIR%"
+mkdir "%DOSSIER%" 2>nul
+cd /d "%DOSSIER%"
 
 echo #############################################
-echo #  BIOS Optimizer - Version Expert         #
+echo #  BIOS Optimizer - Version Professionnelle #
 echo #############################################
 
-:: Phase 1: Export BIOS
-echo [1/3] Export des paramètres actuels...
-"%SCEWIN%" /o "%BIOS_FILE%" /q /b
-if not exist "%BIOS_FILE%" (
-    echo [!] Echec de l'export, tentative alternative...
-    "%SCEWIN%" /o /s "%BIOS_FILE%" /q
+:: Phase 1: Export simple
+echo [1/3] Export BIOS en cours...
+"%SCEWIN%" /o "%FICHIER_BIOS%" /q
+if not exist "%FICHIER_BIOS%" (
+    echo [!] Echec export, tentative 2...
+    "%SCEWIN%" /o "%FICHIER_BIOS%" /q /b
 )
 
-:: Phase 2: Optimisation en PowerShell intégré
+:: Phase 2: Optimisation PowerShell
 echo [2/3] Application des optimisations...
-powershell -nologo -noprofile -command ^
-    $content = [System.IO.File]::ReadAllText('%BIOS_FILE%', [System.Text.Encoding]::ASCII); ^
-    $params = 'IOMMU', 'Spread Spectrum', 'SB Clock Spread Spectrum', 'SMT Control', 'AMD Cool''N''Quiet', 'Fast Boot'; ^
-    foreach ($param in $params) { ^
-        $content = $content -replace "(Setup Question\s*=\s*$param.*?Options\s*=\s*.*?\r?\n\s*)\*?\[[0-9]+\]", "`$1*[00]Disabled"; ^
+powershell -nop -c ^
+    $c=gc '%FICHIER_BIOS%' -Raw; ^
+    $p='IOMMU','Spread Spectrum','SB Clock Spread Spectrum','SMT Control'; ^
+    $p+='AMD Cool''N''Quiet','Fast Boot','Global C-state Control'; ^
+    foreach($i in $p){ ^
+        $c=$c -replace "($i.*?Options\s*=.*?\r?\n\s*)\*?\[[0-9]+\]","`$1*[00]Disabled"; ^
     } ^
-    [System.IO.File]::WriteAllText('%BIOS_FILE%', $content, [System.Text.Encoding]::ASCII); ^
-    $count = ($content | Select-String "\*\[00\]Disabled" -AllMatches).Matches.Count; ^
-    Write-Host "$count parametres desactives avec succes"
+    sc '%FICHIER_BIOS%' $c -Enc ASCII; ^
+    (sls '\*\[00\]Disabled' -input $c -All).Matches.Count
 
-:: Phase 3: Import avec méthode garantie
-echo [3/3] Mise à jour du BIOS...
-start "" /wait "%SCEWIN%" /i "%BIOS_FILE%" /q /b /f
-if %ERRORLEVEL% neq 0 (
-    echo [!] Utilisation de la méthode manuelle...
-    echo Lancez manuellement cette commande:
-    echo "%SCEWIN%" /i "%BIOS_FILE%" /f
-    pause
-    exit /b
+:: Phase 3: Import ULTRA compatible
+echo [3/3] Import final...
+if exist "%FICHIER_BIOS%" (
+    echo Lancement de SCEWIN en mode manuel...
+    start "" /wait "%SCEWIN%" /i "%FICHIER_BIOS%" /q
+    if %ERRORLEVEL% neq 0 (
+        echo [!] Methode forcee...
+        start "" /wait "%SCEWIN%" /i "%FICHIER_BIOS%" /f
+    )
 )
 
 echo #############################################
-echo #  OPERATION REUSSIE - Redemarrage requis  #
+echo #  TERMINE! Redemarrez pour appliquer.     #
+echo #  Fichier: %FICHIER_BIOS%                #
 echo #############################################
-echo Fichier modifie: %BIOS_FILE%
-timeout /t 5 >nul
+pause
