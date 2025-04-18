@@ -1,4 +1,3 @@
-
 param(
     [string]$ExportPath,
     [string]$OutputPath
@@ -23,7 +22,7 @@ $targetParams = @(
     "Bank Interleaving", "SATA GPIO", "Aggressive Link PM Capability", "Core C6 State", "PPC Adjustment"
 )
 
-# Read export file and prepare output
+# Lire le fichier d'export et préparer la sortie
 $output = @()
 $lines = Get-Content $ExportPath
 $inBlock = $false
@@ -33,8 +32,9 @@ $foundName = ""
 foreach ($line in $lines) {
     if ($line -match "^Setup Question\s*=\s*(.+)$") {
         if ($inBlock -and $targetParams -contains $foundName) {
+            # Ajouter le bloc précédent s'il correspond
             $output += $currentBlock
-            $output += "" # ligne vide
+            $output += "" # Ajouter une ligne vide pour séparer les blocs
         }
         $foundName = $matches[1].Trim()
         $currentBlock = @($line)
@@ -43,7 +43,7 @@ foreach ($line in $lines) {
         $inBlock = $false
         if ($targetParams -contains $foundName) {
             $output += $currentBlock
-            $output += "" # ligne vide
+            $output += "" # Ajouter une ligne vide
         }
         $currentBlock = @($line)
         $foundName = $line
@@ -52,22 +52,25 @@ foreach ($line in $lines) {
         if ($line -match "^\s*\*?\[\w+\](.+?)$") {
             $option = $matches[1].Trim()
             $desired = $enabledParams[$foundName]
+            # Appliquer la modification si l'option correspond à ce qui est souhaité
             if ($desired -and $option -like "*$desired*") {
-                $line = $line -replace "^\s*\*?", "         *"
+                $line = $line -replace "^\s*\*?", "         *" # Ajouter "*" si option désirée trouvée
             } elseif (-not $desired -and $option -like "*Disabled*") {
-                $line = $line -replace "^\s*\*?", "         *"
+                $line = $line -replace "^\s*\*?", "         *" # Marquer Disabled si pas désiré
             } else {
-                $line = $line -replace "^\s*\*", "         "
+                $line = $line -replace "^\s*\*", "         " # Retirer "*" sinon
             }
         }
         $currentBlock += $line
     }
 }
 
-# Dernier bloc
+# Ajouter le dernier bloc si nécessaire
 if ($inBlock -and $targetParams -contains $foundName) {
     $output += $currentBlock
 }
 
-# Écriture
+# Écriture du fichier de sortie
 $output | Set-Content $OutputPath -Encoding ascii
+
+Write-Host "Fichier modifié sauvegardé dans : $OutputPath"
