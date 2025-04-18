@@ -11,7 +11,7 @@ $enabledParams = @{
     "PCI-X Latency Timer" = "32 PCI Bus Clocks"
 }
 
-# Liste complète des paramètres à modifier
+# Liste complète des paramètres à garder
 $targetParams = @(
     "IOMMU", "Spread Spectrum", "SB Clock Spread Spectrum", "SMT Control",
     "AMD Cool'N'Quiet", "Fast Boot", "Global C-state Control", "Chipset Power Saving Features",
@@ -22,55 +22,58 @@ $targetParams = @(
     "Bank Interleaving", "SATA GPIO", "Aggressive Link PM Capability", "Core C6 State", "PPC Adjustment"
 )
 
-# Lire le fichier d'export et préparer la sortie
-$output = @()
+# Lire le fichier d'export
 $lines = Get-Content $ExportPath
 $inBlock = $false
 $currentBlock = @()
 $foundName = ""
+$startSection = $true  # Flag pour le début du fichier
+
+# Créer une liste pour les résultats à conserver
+$output = @()
 
 foreach ($line in $lines) {
-    if ($line -match "^Setup Question\s*=\s*(.+)$") {
-        if ($inBlock -and $targetParams -contains $foundName) {
-            # Ajouter le bloc précédent s'il correspond
-            $output += $currentBlock
-            $output += "" # Ajouter une ligne vide pour séparer les blocs
+    # Garde le début du fichier intact
+    if ($startSection) {
+        $output += $line
+        if ($line -match "AMISCE Utility") {
+            $startSection = $false  # À partir de ce moment, on commence à traiter les paramètres
         }
-        $foundName = $matches[1].Trim()
-        $currentBlock = @($line)
-        $inBlock = $true
-    } elseif ($inBlock -and $line -match "^Setup Question") {
-        $inBlock = $false
-        if ($targetParams -contains $foundName) {
-            $output += $currentBlock
-            $output += "" # Ajouter une ligne vide
+    } else {
+        # Si on trouve un paramètre dans la liste targetParams
+        if ($line -match "^Setup Question\s*=\s*(.+)$") {
+            $foundName = $matches[1].Trim()
+            $currentBlock = @($line)
+            $inBlock = $true
         }
-        $currentBlock = @($line)
-        $foundName = $line
-        $inBlock = $true
-    } elseif ($inBlock) {
-        if ($line -match "^\s*\*?\[\w+\](.+?)$") {
+        # Si on est dans un bloc, on va ajouter les lignes
+        elseif ($inBlock -and $line -match "^\s*\*?\[\w+\](.+?)$") {
             $option = $matches[1].Trim()
             $desired = $enabledParams[$foundName]
-            # Appliquer la modification si l'option correspond à ce qui est souhaité
-            if ($desired -and $option -like "*$desired*") {
-                $line = $line -replace "^\s*\*?", "         *" # Ajouter "*" si option désirée trouvée
-            } elseif (-not $desired -and $option -like "*Disabled*") {
-                $line = $line -replace "^\s*\*?", "         *" # Marquer Disabled si pas désiré
-            } else {
-                $line = $line -replace "^\s*\*", "         " # Retirer "*" sinon
+            if ($targetParams -contains $foundName) {
+                if ($desired -and $option -like "*$desired*") {
+                    $line = $line -replace "^\s*\*?", "         *"
+                } elseif (-not $desired -and $option -like "*Disabled*") {
+                    $line = $line -replace "^\s*\*?", "         *"
+                } else {
+                    $line = $line -replace "^\s*\*", "         "
+                }
+                $currentBlock += $line
             }
         }
-        $currentBlock += $line
+        # Si on atteint la fin d'un bloc, on ajoute le bloc si le paramètre est dans la liste
+        elseif ($inBlock -and $line -match "^Setup Question") {
+            $inBlock = $false
+            if ($targetParams -contains $foundName) {
+                $output += $currentBlock
+                $output += ""  # Ajouter une ligne vide entre les blocs
+            }
+            $currentBlock = @($line)
+            $foundName = $line
+            $inBlock = $true
+        }
     }
 }
 
-# Ajouter le dernier bloc si nécessaire
-if ($inBlock -and $targetParams -contains $foundName) {
-    $output += $currentBlock
-}
-
-# Écriture du fichier de sortie
+# Écrire le fichier de sortie avec les résultats filtrés
 $output | Set-Content $OutputPath -Encoding ascii
-
-Write-Host "Fichier modifié sauvegardé dans : $OutputPath"
