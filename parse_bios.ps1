@@ -1,9 +1,9 @@
 param(
-    [string]$InputFile = "BIOSSettings.txt"
+    [string]$FichierBIOS = "BIOSSettings.txt"
 )
 
-# Complete list of parameters to disable
-$paramsToDisable = @(
+# Liste complète des paramètres à désactiver
+$paramsDesactiver = @(
     "IOMMU", "Spread Spectrum", "SB Clock Spread Spectrum",
     "SMT Control", "AMD Cool'N'Quiet", "Fast Boot",
     "Global C-state Control", "Chipset Power Saving Features",
@@ -13,31 +13,26 @@ $paramsToDisable = @(
     "SR-IOV Support", "BME DMA Mitigation", "Opcache Control"
 )
 
-$content = Get-Content $InputFile -Raw
+$contenu = Get-Content $FichierBIOS -Raw
 
-# Enhanced regex pattern for complete parameter blocks
-$pattern = '(?s)(Setup Question\s*=\s*(?<name>.*?)\r?\n.*?Token\s*=\s*.*?\r?\n.*?Offset\s*=\s*.*?\r?\n.*?Width\s*=\s*.*?\r?\n.*?BIOS Default\s*=\s*.*?\r?\n.*?Options\s*=\s*(?<options>.*?)(\r?\n\s*\*?\[[0-9]+\].*?)*)'
+# Pattern amélioré pour la compatibilité AMI
+$pattern = '(?sm)(Setup Question\s*=\s*(?<nom>.*?)\r?\n.*?Options\s*=\s*)(?<options>.*?)(\r?\n\s*)(\*?\[[0-9]+\].*?)*'
 
-$content = [regex]::Replace($content, $pattern, {
+$contenu = [regex]::Replace($contenu, $pattern, {
     param($match)
-    $paramName = $match.Groups['name'].Value.Trim()
-    $optionsBlock = $match.Groups[0].Value
+    $nomParam = $match.Groups['nom'].Value.Trim()
     
-    if ($paramsToDisable -contains $paramName) {
-        # Remove all existing selections
-        $optionsBlock = $optionsBlock -replace '\*\[[0-9]+\]', ''
-        # Force selection to [00]Disabled
-        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)(\[00\])', "`$1*`$2"
-        # Remove other selections
-        $optionsBlock = $optionsBlock -replace '(\r?\n\s*)\*\[', "`$1 ["
+    if ($paramsDesactiver -contains $nomParam) {
+        $nouvellesOptions = $match.Groups['options'].Value -replace '\*\[[0-9]+\]', ''
+        return $match.Groups[1].Value + $nouvellesOptions + $match.Groups[3].Value + "*[00]Disabled"
     }
     
-    return $optionsBlock
+    return $match.Value
 })
 
-# Rewrite file with proper AMI formatting
-[System.IO.File]::WriteAllText($InputFile, $content, [System.Text.Encoding]::ASCII)
+# Réécriture du fichier avec formatage correct
+[System.IO.File]::WriteAllText($FichierBIOS, $contenu, [System.Text.Encoding]::ASCII)
 
-# Final verification
-$disabledCount = (Select-String -Path $InputFile -Pattern "\*\[00\]" -AllMatches).Matches.Count
-Write-Output "$disabledCount parameters have been disabled"
+# Comptage des modifications
+$nbModifs = ($contenu | Select-String "\*\[00\]Disabled" -AllMatches).Matches.Count
+Write-Output "$nbModifs parametres desactives avec succes"
