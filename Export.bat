@@ -1,1 +1,4 @@
-SCEWIN_64.exe /O /S BIOSSettings.txt
+@echo off
+echo Exportation des paramètres BIOS...
+SCEWIN_64.exe -export "C:\ProgramData\warris\Results.txt"
+pause
