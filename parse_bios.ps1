@@ -38,6 +38,6 @@ foreach ($param in $parametersToDisable) {
 
 Set-Content -Encoding ASCII -Path $filePath -Value $content
 
-# Check combien de paramètres ont bien été désactivés
+# Check how many parameters were successfully disabled
 $matchCount = ([regex]::Matches($content, "\*\[00\]Disabled")).Count
 Write-Host "[✓] $matchCount BIOS parameters modified." -ForegroundColor Green
