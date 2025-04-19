@@ -1,60 +1,43 @@
-@echo off
-setlocal enabledelayedexpansion
-cls
-title BIOS Optimizer - Version Finale FR
-
-:: Vérification admin ultra-fiable
-whoami /groups | find "S-1-16-12288" > nul || (
-    echo [!] Relance en admin...
-    timeout /t 1 >nul
-    powershell Start-Process -FilePath "%~0" -Verb RunAs
-    exit /b
+param (
+    [string]$filePath
 )
 
-set "DOSSIER=%ProgramData%\BIOS_Optimizer"
-set "SCEWIN=%DOSSIER%\SCEWIN_64.exe"
-set "FICHIER_BIOS=%DOSSIER%\BIOSSettings.txt"
+if (!(Test-Path $filePath)) {
+    Write-Host "[X] BIOS file not found." -ForegroundColor Red
+    exit 1
+}
 
-mkdir "%DOSSIER%" 2>nul
-cd /d "%DOSSIER%"
+$content = Get-Content -Raw -Encoding ASCII -Path $filePath
 
-echo #############################################
-echo #  BIOS Optimizer - Version Professionnelle #
-echo #############################################
-
-:: Phase 1: Export simple
-echo [1/3] Export BIOS en cours...
-"%SCEWIN%" /o "%FICHIER_BIOS%" /q
-if not exist "%FICHIER_BIOS%" (
-    echo [!] Echec export, tentative 2...
-    "%SCEWIN%" /o "%FICHIER_BIOS%" /q /b
+$parametersToDisable = @(
+    'IOMMU',
+    'Spread Spectrum',
+    'SB Clock Spread Spectrum',
+    'SMT Control',
+    "AMD Cool'N'Quiet",
+    'Fast Boot',
+    'Global C-state Control',
+    'Chipset Power Saving Features',
+    'Remote Display Feature',
+    'PS2 Devices Support',
+    'Ipv6 PXE Support',
+    'IPv6 HTTP Support',
+    'PSS Support',
+    'AB Clock Gating',
+    'PCIB Clock Run',
+    'SR-IOV Support',
+    'BME DMA Mitigation',
+    'Opcache Control'
 )
 
-:: Phase 2: Optimisation PowerShell
-echo [2/3] Application des optimisations...
-powershell -nop -c ^
-    $c=gc '%FICHIER_BIOS%' -Raw; ^
-    $p='IOMMU','Spread Spectrum','SB Clock Spread Spectrum','SMT Control'; ^
-    $p+='AMD Cool''N''Quiet','Fast Boot','Global C-state Control'; ^
-    foreach($i in $p){ ^
-        $c=$c -replace "($i.*?Options\s*=.*?\r?\n\s*)\*?\[[0-9]+\]","`$1*[00]Disabled"; ^
-    } ^
-    sc '%FICHIER_BIOS%' $c -Enc ASCII; ^
-    (sls '\*\[00\]Disabled' -input $c -All).Matches.Count
+foreach ($param in $parametersToDisable) {
+    $pattern = "($param.*?Options\s*=.*?\r?\n\s*)\*?\[[0-9]+\]"
+    $replacement = '$1*[00]Disabled'
+    $content = [regex]::Replace($content, $pattern, $replacement)
+}
 
-:: Phase 3: Import ULTRA compatible
-echo [3/3] Import final...
-if exist "%FICHIER_BIOS%" (
-    echo Lancement de SCEWIN en mode manuel...
-    start "" /wait "%SCEWIN%" /i "%FICHIER_BIOS%" /q
-    if %ERRORLEVEL% neq 0 (
-        echo [!] Methode forcee...
-        start "" /wait "%SCEWIN%" /i "%FICHIER_BIOS%" /f
-    )
-)
+Set-Content -Encoding ASCII -Path $filePath -Value $content
 
-echo #############################################
-echo #  TERMINE! Redemarrez pour appliquer.     #
-echo #  Fichier: %FICHIER_BIOS%                #
-echo #############################################
-pause
+# Check combien de paramètres ont bien été désactivés
+$matchCount = ([regex]::Matches($content, "\*\[00\]Disabled")).Count
+Write-Host "[✓] $matchCount BIOS parameters modified." -ForegroundColor Green
